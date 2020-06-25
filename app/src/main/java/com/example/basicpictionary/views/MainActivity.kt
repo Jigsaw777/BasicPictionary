@@ -1,6 +1,8 @@
 package com.example.basicpictionary.views
 
 import android.content.Context
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -31,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initListener()
     }
-
 
     private fun initListener() {
         start_game.setOnClickListener {

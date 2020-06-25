@@ -1,6 +1,7 @@
 package com.example.basicpictionary.views
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,8 @@ class GameFragment : Fragment() {
     private val viewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(MainViewModel::class.java)
     }
+    private lateinit var timer: CountDownTimer
+    private var isTimerRunning=false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,36 +37,74 @@ class GameFragment : Fragment() {
         setRound(viewModel.roundNumber)
         setImage()
         initListeners()
+        startTimer()
     }
 
-    private fun initListeners(): Unit {
+    private fun initListeners() {
         next_button.setOnClickListener {
-            val name = enter_text.text.toString()
-            if (name.equals(currentImage.answer, true)) {
-                viewModel.level += 1
-                gotoNextImages()
+            processAnswer()
+        }
+
+        timer = object : CountDownTimer(40000L, 1000L) {
+            override fun onFinish() {
+                isTimerRunning=false
+                processAnswer()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                isTimerRunning=true
+                time_text.text=(millisUntilFinished/1000).toString()
+            }
+
+        }
+    }
+
+    override fun onDestroyView() {
+        timer.cancel()
+        isTimerRunning=false
+        super.onDestroyView()
+    }
+
+    private fun processAnswer(){
+        val name = enter_text.text.toString()
+        if (name.equals(currentImage.answer, true)) {
+            gotoNextImages(true)
+        } else {
+            if (name.trim().isEmpty() && isTimerRunning) {
+                Toast.makeText(requireContext(), AppConstants.EMPTY_WARNING, Toast.LENGTH_SHORT)
+                    .show()
             } else {
-                if (name.trim().isEmpty()) {
-                    Toast.makeText(requireContext(), AppConstants.EMPTY_WARNING, Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    viewModel.level -= 1
-                    gotoNextImages()
-                }
+                gotoNextImages(false)
             }
         }
     }
 
-    private fun gotoNextImages() {
+    private fun startTimer() {
+        timer.start()
+    }
+
+    private fun resetTimer() {
+        timer.cancel()
+        timer.start()
+    }
+
+    private fun gotoNextImages(isCorrectAnswer: Boolean) {
+        if (isCorrectAnswer)
+            viewModel.level += 1
+        else
+            viewModel.level -= 1
         viewModel.round.postValue(++viewModel.roundNumber)
         checkLevel()
         enter_text.text?.clear()
         if (viewModel.roundNumber <= viewModel.maxLevels)
             setImage()
+        resetTimer()
     }
 
     private fun checkLevel() {
         if (viewModel.level == viewModel.maxLevels) {
+            timer.cancel()
+            isTimerRunning=false
             Toast.makeText(
                 requireContext(),
                 AppConstants.WIN_TEXT,
