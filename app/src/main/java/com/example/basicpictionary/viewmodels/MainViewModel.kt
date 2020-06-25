@@ -43,8 +43,6 @@ class MainViewModel : ViewModel() {
     fun checkDiffAndSendImage(): ImageEntity? {
         var removed: ImageEntity? = null
         for (i in 0 until arr.size) {
-            Log.d("vm", "start : ${arr[i].first}")
-            Log.d("vm", "end : ${arr[i].second}")
             if(arr[i].first>arr[i].second)
                 finishGame.postValue(true)
             else if (list[arr[i].second].difficulty == difficulty) {
