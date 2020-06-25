@@ -36,21 +36,30 @@ class GameFragment : Fragment() {
         initListeners()
     }
 
-    private fun initListeners() {
+    private fun initListeners(): Unit {
         next_button.setOnClickListener {
             val name = enter_text.text.toString()
-            viewModel.round.postValue(++viewModel.roundNumber)
             if (name.equals(currentImage.answer, true)) {
                 viewModel.level += 1
+                gotoNextImages()
             } else {
-                viewModel.level -= 1
+                if (name.trim().isEmpty()) {
+                    Toast.makeText(requireContext(), AppConstants.EMPTY_WARNING, Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    viewModel.level -= 1
+                    gotoNextImages()
+                }
             }
-            checkLevel()
-            enter_text.text?.clear()
-            if (viewModel.roundNumber <= viewModel.maxLevels)
-                setImage()
-
         }
+    }
+
+    private fun gotoNextImages() {
+        viewModel.round.postValue(++viewModel.roundNumber)
+        checkLevel()
+        enter_text.text?.clear()
+        if (viewModel.roundNumber <= viewModel.maxLevels)
+            setImage()
     }
 
     private fun checkLevel() {

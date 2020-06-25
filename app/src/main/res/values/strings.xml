@@ -7,4 +7,6 @@
     <string name="answer_text">Answer</string>
     <string name="next_text">Next</string>
     <string name="preparing_text">Preparing Game</string>
+    <string name="instructions">You have 10 points in the beginning. \nWrong answer reduces your point by -1.
+        \nRight answer gives you +1. \nTry to answer within \nthe stipulated time. \nGood luck!!</string>
 </resources>
