@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BasicPictionary</string>
+    <string name="app_name">AdaptivePictionary</string>
 
     <string name="pictionary_text">Adaptive Pictionary</string>
     <string name="start_game">Start Game</string>
