@@ -4,11 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.example.basicpictionary.R
+import com.example.basicpictionary.constants.AppConstants
 import com.example.basicpictionary.entities.ImageEntity
 import com.example.basicpictionary.viewmodels.MainViewModel
 import com.google.gson.Gson
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         initListener()
     }
 
+
     private fun initListener() {
         start_game.setOnClickListener {
 
@@ -49,15 +51,38 @@ class MainActivity : AppCompatActivity() {
             }
             val thread = Thread(JsonProcessor(this, handler))
             if (!isRunning) {
-                isRunning=true
+                isRunning = true
                 thread.start()
             }
         }
 
+        viewModel.round.observe(this, androidx.lifecycle.Observer {
+            val str = "Round $it/${viewModel.maxLevels}"
+            rounds_text.text = str
+
+            if (it > viewModel.maxLevels) {
+                for (i in 0 until supportFragmentManager.backStackEntryCount)
+                    supportFragmentManager.popBackStack()
+                AlertDialog.Builder(this).setMessage(AppConstants.UPDATE_TEXT)
+                    .setPositiveButton(
+                        "Ok"
+                    ) { dialog, _ -> dialog.dismiss() }.show()
+            }
+        })
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (supportFragmentManager.backStackEntryCount == 0) {
+                rounds_text.visibility = View.GONE
+                act_layout.visibility = View.VISIBLE
+                viewModel.clear()
+            }
+        }
     }
 
     private fun setData(list: List<ImageEntity>) {
+        rounds_text.visibility = View.VISIBLE
         viewModel.list = list.toMutableList()
+        viewModel.maxLevels = list.size
     }
 
     private fun showProgress() {
@@ -69,7 +94,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun moveToFragment() {
-        Log.d("act", viewModel.list[0].imageUrl)
+        act_layout.visibility = View.GONE
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, GameFragment())
+            .addToBackStack(null).commit()
     }
 }
 
