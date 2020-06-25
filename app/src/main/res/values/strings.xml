@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">BasicPictionary</string>
 
-    <string name="pictionary_text">Pictionary</string>
+    <string name="pictionary_text">Adaptive Pictionary</string>
     <string name="start_game">Start Game</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="answer_text">Answer</string>
     <string name="next_text">Next</string>
     <string name="preparing_text">Preparing Game</string>
-    <string name="instructions">You have 10 points in the beginning. \nWrong answer reduces your point by -1.
+    <string name="instructions">You have 3 points in the beginning. \nWrong answer reduces your point by -1.
         \nRight answer gives you +1. \nTry to answer within \nthe stipulated time. \nGood luck!!</string>
 </resources>

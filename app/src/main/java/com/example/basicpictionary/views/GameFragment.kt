@@ -2,11 +2,13 @@ package com.example.basicpictionary.views
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.example.basicpictionary.R
@@ -17,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_game.*
 
 class GameFragment : Fragment() {
 
-    private lateinit var currentImage: ImageEntity
+    private var currentImage: ImageEntity? = null
     private val viewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(MainViewModel::class.java)
     }
@@ -45,15 +47,20 @@ class GameFragment : Fragment() {
             processAnswer()
         }
 
+        viewModel.finishGame.observe(this, Observer {
+            if (it)
+                fragmentManager?.popBackStack()
+        })
+
         timer = object : CountDownTimer(40000L, 1000L) {
             override fun onFinish() {
-                isTimerRunning=false
+                isTimerRunning = false
                 processAnswer()
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                isTimerRunning=true
-                time_text.text=(millisUntilFinished/1000).toString()
+                isTimerRunning = true
+                time_text.text = (millisUntilFinished / 1000).toString()
             }
 
         }
@@ -65,15 +72,20 @@ class GameFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun processAnswer(){
+    private fun processAnswer() {
         val name = enter_text.text.toString()
-        if (name.equals(currentImage.answer, true)) {
+        if (name.equals(currentImage?.answer, true)) {
+            viewModel.noCorrect += 1
+            if (viewModel.noCorrect % 2 == 0)
+                viewModel.difficulty += 1
             gotoNextImages(true)
         } else {
             if (name.trim().isEmpty() && isTimerRunning) {
                 Toast.makeText(requireContext(), AppConstants.EMPTY_WARNING, Toast.LENGTH_SHORT)
                     .show()
             } else {
+                if (viewModel.difficulty > 1)
+                    viewModel.difficulty -= 1
                 gotoNextImages(false)
             }
         }
@@ -90,9 +102,9 @@ class GameFragment : Fragment() {
 
     private fun gotoNextImages(isCorrectAnswer: Boolean) {
         if (isCorrectAnswer)
-            viewModel.level += 1
+            viewModel.score += 1
         else
-            viewModel.level -= 1
+            viewModel.score -= 1
         viewModel.round.postValue(++viewModel.roundNumber)
         checkLevel()
         enter_text.text?.clear()
@@ -102,9 +114,9 @@ class GameFragment : Fragment() {
     }
 
     private fun checkLevel() {
-        if (viewModel.level == viewModel.maxLevels) {
+        if (viewModel.score == viewModel.maxLevels) {
             timer.cancel()
-            isTimerRunning=false
+            isTimerRunning = false
             Toast.makeText(
                 requireContext(),
                 AppConstants.WIN_TEXT,
@@ -112,13 +124,13 @@ class GameFragment : Fragment() {
             ).show()
         }
 
-        if (viewModel.level == 0) {
+        if (viewModel.score == 0) {
             Toast.makeText(
                 requireContext(),
                 AppConstants.LOSE_TEXT,
                 Toast.LENGTH_LONG
             ).show()
-            fragmentManager?.popBackStack()
+            viewModel.finishGame.postValue(true)
         }
     }
 
@@ -127,9 +139,11 @@ class GameFragment : Fragment() {
     }
 
     private fun setImage() {
-        currentImage = viewModel.getImageEntity()
+        currentImage = viewModel.checkDiffAndSendImage()
+        val scoreStr = "Your Current score is : ${viewModel.score}"
+        score_text.text = scoreStr
         Glide.with(this)
-            .load(currentImage.imageUrl)
+            .load(currentImage?.imageUrl)
             .into(action_image)
     }
 

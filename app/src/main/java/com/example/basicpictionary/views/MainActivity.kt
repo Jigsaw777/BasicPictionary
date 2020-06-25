@@ -82,8 +82,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setData(list: List<ImageEntity>) {
         rounds_text.visibility = View.VISIBLE
-        viewModel.list = list.toMutableList()
-        viewModel.maxLevels = list.size
+        viewModel.init(list)
     }
 
     private fun showProgress() {
@@ -135,7 +134,7 @@ class JsonProcessor(private val context: Context, private val handler: Handler) 
             val imageEntity = gson.fromJson(obj.toString(), ImageEntity::class.java)
             list.add(imageEntity)
         }
-        list.sortWith(Comparator { o1, o2 -> o1?.id?.compareTo(o2?.id ?: 0) ?: 0 })
+        list.sortWith(Comparator { o1, o2 -> o1?.difficulty?.compareTo(o2?.difficulty ?: 0) ?: 0 })
         return list
     }
 }
