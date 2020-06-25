@@ -1,13 +1,10 @@
 package com.example.basicpictionary.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.basicpictionary.entities.ImageEntity
-import java.text.FieldPosition
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.absoluteValue
 
 class MainViewModel : ViewModel() {
 
@@ -21,7 +18,7 @@ class MainViewModel : ViewModel() {
     val finishGame=MutableLiveData<Boolean>()
     var maxLevels = 10
     var difficulty = 1
-    var score = 5
+    var score = 3
 
 
     fun init(listIP: List<ImageEntity>) {
@@ -68,10 +65,8 @@ class MainViewModel : ViewModel() {
     private fun updatePairList(position: Int){
         for(i in position until arr.size){
             val pair = arr[i]
-//            if(pair.first.absoluteValue>pair.second.absoluteValue)
-//                finishGame.postValue(true)
-//            val startPos = if (pair.first != 0) pair.first - 1 else pair.first
-            val new = pair.first to pair.second - 1
+            val startPos=if(i==position) pair.first else pair.first-1
+            val new = startPos to pair.second - 1
             arr.removeAt(i)
             arr.add(i, new)
         }

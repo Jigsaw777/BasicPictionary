@@ -8,5 +8,6 @@
     <string name="next_text">Next</string>
     <string name="preparing_text">Preparing Game</string>
     <string name="instructions">You have 3 points in the beginning. \nWrong answer reduces your point by -1.
-        \nRight answer gives you +1. \nTry to answer within \nthe stipulated time. \nGood luck!!</string>
+        \nRight answer gives you +1. \nTry to answer within \nthe stipulated time.
+        \nDifficulty level increases \nwith every two right answers \nGood luck!!</string>
 </resources>

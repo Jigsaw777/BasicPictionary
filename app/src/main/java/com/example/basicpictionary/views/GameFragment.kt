@@ -76,7 +76,7 @@ class GameFragment : Fragment() {
         val name = enter_text.text.toString()
         if (name.equals(currentImage?.answer, true)) {
             viewModel.noCorrect += 1
-            if (viewModel.noCorrect % 2 == 0)
+            if (viewModel.noCorrect % 2 == 0 && viewModel.difficulty<5)
                 viewModel.difficulty += 1
             gotoNextImages(true)
         } else {
